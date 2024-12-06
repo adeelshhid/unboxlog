@@ -1,20 +1,37 @@
-<ion-tabs>
+<div class="camera-container" *ngIf="isCameraStarted">
+  <div class="overlay">
+    <div class="image-counter">Bilder aufgenommen: {{ bildCounter }}</div>
+    <div id="cameraPreview"></div>
+    <div class="button-background">
+      <ion-button expand="block" (click)="takePicture()">
+        <ion-icon name="camera"></ion-icon>
+        Aufnehmen
+      </ion-button>
+      <ion-button expand="block" color="danger" (click)="stopCamera()">
+        <ion-icon name="arrow-undo-circle-outline"></ion-icon>
+        Schließen
+      </ion-button>
+    </div>
+  </div>
+</div>
 
+<ion-tabs *ngIf="!isCameraStarted">
   <ion-tab-bar slot="bottom">
     <ion-tab-button tab="tab1" href="/tabs/tab1">
-      <ion-icon aria-hidden="true" name="triangle"></ion-icon>
+      <ion-icon aria-hidden="true" name="list"></ion-icon>
       <ion-label>Tab 1</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="tab2" href="/tabs/tab2">
-      <ion-icon aria-hidden="true" name="ellipse"></ion-icon>
-      <ion-label>Tab 2</ion-label>
+    <ion-tab-button (click)="openCamera()">
+      <ion-icon name="camera"></ion-icon>
+      <ion-label>Foto</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="tab3" href="/tabs/tab3">
-      <ion-icon aria-hidden="true" name="square"></ion-icon>
+      <ion-icon name="images"></ion-icon>
       <ion-label>Tab 3</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
-
 </ion-tabs>
+
+<div class="flash-overlay" *ngIf="showFlash"></div>

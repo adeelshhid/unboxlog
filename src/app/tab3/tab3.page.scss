@@ -1,0 +1,30 @@
+.photo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .photo-item {
+    position: relative;
+    width: 48%;
+    margin: 6px 1%;
+  }
+  
+  .photo-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .delete-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 100;
+      color: #0871f9;
+      background: rgba(255, 255, 255, 0);
+  }
+  
+  

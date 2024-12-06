@@ -35,3 +35,47 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+
+@font-face {
+    font-family: 'Oxygen';
+    src: url('./assets/fonts/Oxygen/Oxygen-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  * {
+    font-family: 'Oxygen', sans-serif !important;
+  }
+  
+  // Alert Styles
+  .alert-radio-label.sc-ion-alert-md,
+  .alert-radio-label.sc-ion-alert-ios {
+    color: var(--ion-color-primary) !important;
+  }
+  
+  .alert-radio-inner.sc-ion-alert-md,
+  .alert-radio-inner.sc-ion-alert-ios {
+    background-color: var(--ion-color-primary) !important;
+  }
+  
+  // Checkbox Styles
+  ion-checkbox {
+    --checkbox-background-checked: var(--ion-color-primary);
+    --checkbox-background-checked-hover: var(--ion-color-primary-shade);
+    --border-color-checked: var(--ion-color-primary);
+    --checkmark-color: white;
+  }
+  
+  // Alert Button Color
+  .alert-button.sc-ion-alert-md,
+  .alert-button.sc-ion-alert-ios {
+    color: var(--ion-color-primary) !important;
+  }
+  
+  // Alert Radio Button Selected
+  .alert-radio-group.sc-ion-alert-md button[aria-checked="true"],
+  .alert-radio-group.sc-ion-alert-ios button[aria-checked="true"] {
+    color: var(--ion-color-primary) !important;
+  }
+

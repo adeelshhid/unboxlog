@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'Photo-Gallery-Fixed',
+  appId: 'com.exofters.unboxlog',
+  appName: 'Unboxlog',
   webDir: 'www'
 };
 

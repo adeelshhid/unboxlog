@@ -1,0 +1,44 @@
+ion-content {
+    --padding-top: 16px;
+    --padding-bottom: 16px;
+  }
+  
+  ion-item-divider {
+    --background: var(--ion-color-light);
+    --color: var(--ion-color-primary);
+    margin-top: 16px;
+    font-weight: bold;
+  }
+  
+  .save-button {
+    margin: 24px 16px;
+  }
+  
+  ion-select {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  ion-input {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    margin-top: 4px;
+  }
+  
+  // Dark Mode spezifische Styles
+  :host(.dark-theme) {
+    ion-content {
+      --background: var(--ion-color-dark);
+    }
+  
+    ion-item {
+      --background: var(--ion-color-dark);
+      --color: var(--ion-color-light);
+    }
+  
+    ion-item-divider {
+      --background: var(--ion-color-medium);
+      --color: var(--ion-color-light);
+    }
+  }
+  

@@ -1,17 +1,91 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 1
+      UnboxLog
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-img src="assets/icon/logo.png" style="width: 40px; height: 40px; margin-right: 16px;"></ion-img>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <form [formGroup]="frageForm">
+    <ion-list>
+      <!-- Name -->
+      <ion-item class="question-item">
+        <ion-label position="center">Name</ion-label>
+        <ion-input formControlName="name" placeholder="Name eingeben" class="custom-input"></ion-input>
+      </ion-item>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+      <!-- Kundennummer -->
+      <ion-item class="question-item">
+        <ion-label position="center">Kundennummer</ion-label>
+        <ion-input 
+          type="number" 
+          formControlName="kundennummer" 
+          placeholder="Kundennummer eingeben" 
+          class="custom-input">
+        </ion-input>
+      </ion-item>
+
+      <!-- Restliche Fragen -->
+      <div formArrayName="fragen">
+        <ion-item *ngFor="let frageCtrl of fragen.controls; let i = index" class="question-item">
+          <ion-label>{{ fragenListe[i + 2] }}</ion-label>
+          <ion-segment 
+            [formControlName]="i" 
+            class="narrow-segment" 
+            (ionChange)="onSegmentChange(i, $event)">
+            <ion-segment-button value="ja">
+              <ion-label>Ja</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="nein">
+              <ion-label>Nein</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </ion-item>
+      </div>
+
+      <!-- Anzeige des Polsterungsstatus -->
+      <ion-item *ngIf="fragenListe[3] && frageForm.get('polsterungStatus')?.value" class="question-item">
+        <ion-label>Status der Polsterung</ion-label>
+        <ion-text>{{ frageForm.get('polsterungStatus')?.value | titlecase }}</ion-text>
+      </ion-item>
+
+      <!-- Anzeige des Innenraumsicherungsstatus -->
+      <ion-item *ngIf="fragenListe[6] && frageForm.get('innenraumsicherungStatus')?.value" class="question-item">
+        <ion-label>Status der Innenraumsicherung</ion-label>
+        <ion-text>{{ frageForm.get('innenraumsicherungStatus')?.value | titlecase }}</ion-text>
+      </ion-item>
+
+      <!-- Anzeige der Gehäusebeschädigungen -->
+      <ion-item *ngIf="fragenListe[7] && (frageForm.get('gehaeuseBeschädigtAuswahl')?.value?.length ?? 0) > 0" class="question-item">
+        <ion-label>Gehäusebeschädigungen</ion-label>
+        <ion-text>{{ frageForm.get('gehaeuseBeschädigtAuswahl')?.value?.join(', ') || 'Keine Beschädigungen' | titlecase }}</ion-text>
+      </ion-item>
+
+      <!-- Sonstiges -->
+      <ion-item class="question-item">
+        <ion-label position="center">Sonstiges</ion-label>
+        <ion-input formControlName="sonstiges" placeholder="Sonstiges eingeben" class="custom-input"></ion-input>
+      </ion-item>
+
+      <!-- Fotos -->
+      <ion-item class="question-item">
+        <ion-label>Fotos</ion-label>
+        <ion-button fill="clear" class="camera-button">
+          <ion-icon name="camera" slot="icon-only" class="camera-icon"></ion-icon>
+          <ion-badge class="badge-custom">{{ bildCounter }}</ion-badge>
+        </ion-button>
+      </ion-item>
+
+      <!-- Speichern Button -->
+      <ion-item lines="none">
+        <ion-button expand="block" (click)="speichern()" [disabled]="!frageForm.valid">
+          Speichern
+        </ion-button>
+      </ion-item>
+    </ion-list>
+  </form>
 </ion-content>

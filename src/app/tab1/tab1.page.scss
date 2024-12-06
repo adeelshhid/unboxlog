@@ -1,0 +1,84 @@
+.custom-input {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    margin: 5px;
+    max-width: 200px;
+    text-align: center;
+  }
+  
+  .question-item {
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+  
+    ion-label {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+  
+    ion-input {
+      font-size: 16px;
+    }
+  }
+  
+  .narrow-segment {
+    max-width: 200px;
+  }
+  
+  ion-button[expand="block"] {
+    margin: 20px auto;
+    max-width: 400px;
+    height: 50px;
+    width: 300px;
+    font-size: 18px;
+    --padding-top: 20px;
+    --padding-bottom: 20px;
+  }
+  
+  ion-badge {
+    margin-left: 8px;
+  }
+  
+  ::placeholder {
+    text-align: center;
+  }
+  
+  ion-input {
+    text-align: center;
+  }
+  
+  .camera-icon {
+    font-size: 24px;
+    color: white;
+  }
+  
+  .camera-button {
+    --color: white;
+  }
+  
+  .badge-custom {
+    font-size: 16px;
+    margin-left: 8px;
+    --background: transparent;
+    color: white;
+  }
+  
+  ion-content {
+    padding-bottom: 60px; /* Beispiel für reduziertes Padding */
+  }
+  
+  ion-list {
+      padding-bottom: 16px;
+  }
+  
+  /* Optionales Styling für den Polsterungsstatus, Innenraumsicherungsstatus und Gehäusebeschädigungen */
+  ion-text {
+    font-weight: bold;
+    color: #3880ff;
+    margin-left: 10px;
+  }
+  
+  
+  

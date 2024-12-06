@@ -59,6 +59,8 @@ export class Tab1Page {
     this.frageForm.valueChanges.subscribe(data => {
       this.formPersistenceService.saveFormData(data);
     });
+
+    
   }
 
   private initializeForm() {

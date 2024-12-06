@@ -36,24 +36,35 @@ export class StorageService {
     this.cloudConfig = { apiUrl, apiKey };
   }
 
-  public async saveAnswers(kundennummer: string, name: string, answers: any): Promise<void> {
-    switch (this.storageType.value) {
-      case 'local':
-        await this.saveToLocal(kundennummer, name, answers);
-        break;
-      case 'test':
-        await this.saveToTest(kundennummer, name, answers);
-        break;
-      case 'cloud':
-        await this.saveToCloud(kundennummer, name, answers);
-        break;
-      case 'ftp':
-        await this.saveToFTP(kundennummer, name, answers);
-        break;
-      default:
-        await this.saveToLocal(kundennummer, name, answers);
-    }
+  saveAnswers(kundennummer: string, name: string, answers: any): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log("Starting save process...");
+        switch (this.storageType.value) {
+          case 'local':
+            await this.saveToLocal(kundennummer, name, answers);
+            break;
+          case 'test':
+            await this.saveToTest(kundennummer, name, answers);
+            break;
+          case 'cloud':
+            await this.saveToCloud(kundennummer, name, answers);
+            break;
+          case 'ftp':
+            await this.saveToFTP(kundennummer, name, answers);
+            break;
+          default:
+            await this.saveToLocal(kundennummer, name, answers);
+        }
+        console.log("Save process completed successfully.");
+        resolve(); // Resolve promise after successful save
+      } catch (error) {
+        console.error('Error in saveAnswers:', error);
+        reject(error); // Reject promise if an error occurs
+      }
+    });
   }
+  
 
   private async saveToLocal(kundennummer: string, name: string, answers: any): Promise<void> {
     const folderName = `KD${kundennummer} ${name}`;
@@ -165,16 +176,20 @@ export class StorageService {
     
       // Save images to FTP
       const images = await this.photoService.getImages();
-      for (let i = 0; i < images.length; i++) {
+      if (images.length > 0) {
+        for (let i = 0; i < images.length; i++) {
         const imageData = images[i].replace(/^data:image\/\w+;base64,/, '');
         const imageFileName = `bild_${i + 1}.jpg`;
         const imageFilePath = `${folderName}/${imageFileName}`;
         console.log(`Uploading image: "${imageFilePath}"`);
         await this.ftp.upload(imageData, imageFilePath).toPromise();
       }
+      }
     
-      console.log('Data saved to FTP successfully');
+      // console.log('Data saved to FTP successfully');
       await this.ftp.disconnect();
+      return console.log('Data saved to FTP successfully');
+
     } catch (error: any) {
       console.error('Error saving to FTP:', error.message, error);
       throw error;

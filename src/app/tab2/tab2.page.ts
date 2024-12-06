@@ -17,7 +17,7 @@ export class Tab2Page {
 
   constructor(public photoService: PhotoService, private storageService: StorageService) { }
 
-  selectedStorage: 'local' | 'test' | 'cloud' = 'local';
+  selectedStorage: 'local' | 'test' | 'cloud' | 'ftp' = 'local';
   cloudApiUrl: string = '';
   cloudApiKey: string = ''; 
   

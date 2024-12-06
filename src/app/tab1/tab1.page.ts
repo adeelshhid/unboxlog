@@ -42,7 +42,7 @@ export class Tab1Page {
     private photoService: PhotoService,
     private formPersistenceService: FormPersistenceService
   ) {
-    addIcons({ camera ,});
+    addIcons({ camera, });
     this.photoService.images$.subscribe(images => {
       this.bildCounter = images.length;
     });
@@ -50,7 +50,7 @@ export class Tab1Page {
 
   ngOnInit() {
     this.initializeForm();
-    
+
     const savedData = this.formPersistenceService.getFormData();
     if (savedData) {
       this.frageForm.patchValue(savedData);
@@ -60,7 +60,7 @@ export class Tab1Page {
       this.formPersistenceService.saveFormData(data);
     });
 
-    
+
   }
 
   private initializeForm() {
@@ -135,10 +135,10 @@ export class Tab1Page {
 
   async presentGehaeuseBeschädigtAlert() {
     console.log('Popup für Gehäuse beschädigt wird angezeigt');
-    
+
     // Setze die Auswahl zurück, sodass alle Checkboxen unmarkiert sind
     this.frageForm.get('gehaeuseBeschädigtAuswahl')?.setValue([]);
-    
+
     const alert = await this.alertController.create({
       header: 'Gehäuse beschädigt',
       message: 'Bitte wählen Sie die beschädigten Teile des Gehäuses aus:',
@@ -176,7 +176,7 @@ export class Tab1Page {
   /**
    * Speichert die Formulardaten, wenn das Formular gültig ist.
    */
-  speichern() {
+  async speichern() {
     if (this.frageForm.valid) {
       const formValue = this.frageForm.value;
       const kundennummer = formValue.kundennummer;
@@ -185,25 +185,57 @@ export class Tab1Page {
       // Strukturieren der Antworten
       const answers = {
         Umverpackung: formValue.fragen[0],
-        Polsterung: formValue.fragen[1] === 'ja' ? 
+        Polsterung: formValue.fragen[1] === 'ja' ?
           `Ja - ${formValue.polsterungStatus}` : 'Nein',
         fragen: formValue.fragen,
         innenraumsicherungStatus: formValue.innenraumsicherungStatus,
-        'Gehäuse beschädigt': formValue.gehaeuseBeschädigtAuswahl.length > 0 
-          ? `Ja - ${formValue.gehaeuseBeschädigtAuswahl.join(', ')}` 
+        'Gehäuse beschädigt': formValue.gehaeuseBeschädigtAuswahl.length > 0
+          ? `Ja - ${formValue.gehaeuseBeschädigtAuswahl.join(', ')}`
           : 'Nein',
         Sonstiges: formValue.sonstiges || ''
       };
 
-      // Aufrufen der Speichermethode im StorageService
-      this.storageService.saveAnswers(kundennummer, name, answers)
-        .then(() => {
-          this.presentSuccessAlert();
-        })
-        .catch(error => {
-          console.error('Fehler beim Speichern der Antworten:', error);
-          this.presentErrorAlert();
-        });
+      switch (this.storageService.storageType.value) {
+        case 'local':
+          await this.storageService.saveToLocal(kundennummer, name, answers).then(() => {
+            this.presentSuccessAlert()
+          }).catch(err => {
+            this.presentErrorAlert()
+          })
+          break;
+        case 'test':
+          await this.storageService.saveToTest(kundennummer, name, answers).then(() => {
+            this.presentSuccessAlert()
+
+          }).catch(err => {
+            this.presentErrorAlert()
+          })
+          break;
+        case 'cloud':
+          await this.storageService.saveToCloud(kundennummer, name, answers).then(() => {
+            this.presentSuccessAlert()
+
+          }).catch(err => {
+            this.presentErrorAlert()
+          })
+          break;
+        case 'ftp':
+          await this.storageService.saveToFTP(kundennummer, name, answers).then(res => {
+            this.presentSuccessAlert()
+          });
+          break;
+        default:
+          await this.storageService.saveToLocal(kundennummer, name, answers);
+      }
+      // // Aufrufen der Speichermethode im StorageService
+      // this.storageService.saveAnswers(kundennummer, name, answers)
+      //   .then(() => {
+      //     this.presentSuccessAlert();
+      //   })
+      //   .catch(error => {
+      //     console.error('Fehler beim Speichern der Antworten:', error);
+      //     this.presentErrorAlert();
+      //   });
     } else {
       console.log('Formular ist ungültig');
       this.presentInvalidFormAlert();
@@ -277,7 +309,7 @@ export class Tab1Page {
   onSegmentChange(index: number, event: any) {
     const value = event.detail.value;
     if (value === 'ja') {
-      switch(index) {
+      switch (index) {
         case 1: // Polsterung
           this.presentPolsterungAlert();
           break;
@@ -292,7 +324,7 @@ export class Tab1Page {
       }
     } else if (value === 'nein') {
       // Optional: Setzen Sie die zugehörigen Statusfelder zurück, falls notwendig
-      switch(index) {
+      switch (index) {
         case 1: // Polsterung
           this.frageForm.get('polsterungStatus')?.setValue('');
           break;

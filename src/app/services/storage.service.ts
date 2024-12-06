@@ -1,20 +1,22 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { PhotoService } from './photo.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { FTP } from '@awesome-cordova-plugins/ftp/ngx'; // Import FTP Plugin
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
-  private storageType = new BehaviorSubject<string>('ftp');
+   storageType = new BehaviorSubject<string>('ftp');
+   fileUploaded:EventEmitter<boolean> = new EventEmitter();
   private ftpConfig = {
     host: 'ftp.dlptest.com',
     port: 21,
     username: 'dlpuser',
     password: 'rNrKYTX9g7z3RgJRmxWuGHbeu',
-    nativePath: ''
+    nativePath: '',
+    timeout:60000
   };
 
   private cloudConfig = {
@@ -22,7 +24,9 @@ export class StorageService {
     apiKey: ''
   };
 
-  constructor(private photoService: PhotoService, private ftp: FTP) { }
+  constructor(private photoService: PhotoService, private ftp: FTP,
+          
+  ) { }
 
   setStorageType(type: 'local' | 'test' | 'cloud' | 'ftp') {
     this.storageType.next(type);
@@ -36,37 +40,41 @@ export class StorageService {
     this.cloudConfig = { apiUrl, apiKey };
   }
 
-  saveAnswers(kundennummer: string, name: string, answers: any): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        console.log("Starting save process...");
-        switch (this.storageType.value) {
-          case 'local':
-            await this.saveToLocal(kundennummer, name, answers);
-            break;
-          case 'test':
-            await this.saveToTest(kundennummer, name, answers);
-            break;
-          case 'cloud':
-            await this.saveToCloud(kundennummer, name, answers);
-            break;
-          case 'ftp':
-            await this.saveToFTP(kundennummer, name, answers);
-            break;
-          default:
-            await this.saveToLocal(kundennummer, name, answers);
-        }
-        console.log("Save process completed successfully.");
-        resolve(); // Resolve promise after successful save
-      } catch (error) {
-        console.error('Error in saveAnswers:', error);
-        reject(error); // Reject promise if an error occurs
-      }
-    });
-  }
+  // saveAnswers(kundennummer: string, name: string, answers: any): Promise<any> {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       console.log("Starting save process...");
+  //       switch (this.storageType.value) {
+  //         case 'local':
+  //           await this.saveToLocal(kundennummer, name, answers);
+  //           break;
+  //         case 'test':
+  //           await this.saveToTest(kundennummer, name, answers);
+  //           break;
+  //         case 'cloud':
+  //           await this.saveToCloud(kundennummer, name, answers);
+  //           break;
+  //         case 'ftp':
+  //           await this.saveToFTP(kundennummer, name, answers).then(res =>{
+  //             if (res) {
+  //               alert(res)
+  //               resolve(true)
+  //             }
+  //           });
+  //           break;
+  //         default:
+  //           await this.saveToLocal(kundennummer, name, answers);
+  //       }
+  //       console.log("Save process completed successfully.");
+  //     } catch (error) {
+  //       console.error('Error in saveAnswers:', error);
+  //       reject(error); // Reject promise if an error occurs
+  //     }
+  //   });
+  // }
   
 
-  private async saveToLocal(kundennummer: string, name: string, answers: any): Promise<void> {
+   async saveToLocal(kundennummer: string, name: string, answers: any): Promise<void> {
     const folderName = `KD${kundennummer} ${name}`;
 
     try {
@@ -86,7 +94,7 @@ export class StorageService {
     }
   }
 
-  private async saveToTest(kundennummer: string, name: string, answers: any): Promise<void> {
+  async saveToTest(kundennummer: string, name: string, answers: any): Promise<void> {
     console.log('Test-Modus Speicherung:', {
       kundennummer,
       name,
@@ -95,7 +103,7 @@ export class StorageService {
     });
   }
 
-  private async saveToCloud(kundennummer: string, name: string, answers: any): Promise<void> {
+  async saveToCloud(kundennummer: string, name: string, answers: any): Promise<void> {
     if (!this.cloudConfig.apiKey || !this.cloudConfig.apiUrl) {
       throw new Error('Cloud-Konfiguration fehlt');
     }
@@ -111,12 +119,13 @@ export class StorageService {
     });
   }
 
-  private async saveToFTP(kundennummer: string, name: string, answers: any): Promise<void> {
+  async saveToFTP(kundennummer: string, name: string, answers: any): Promise<any> {
+
     const sanitizedName = name.replace(/\s+/g, '_');
     const folderName = `${kundennummer}_${sanitizedName}`;
     
     try {
-      console.log(`Connecting to FTP host: "${this.ftpConfig.host}"`);
+      console.log(`Connecting to FTP host: "${this.ftpConfig}"`);
       await this.ftp.connect(this.ftpConfig.host, this.ftpConfig.username, this.ftpConfig.password);
     
       // Create the directory on FTP
@@ -165,8 +174,19 @@ export class StorageService {
     
       // Upload the local file to FTP
       console.log(`Uploading file to FTP: "${uri}"`);
-      await this.ftp.upload(uri, `${folderName}/${fileName}`).toPromise();
-    
+      await firstValueFrom(this.ftp.upload(uri, `${folderName}/${fileName}`)).then(onUpload => {
+        console.log('resL: ', onUpload);
+        return true;
+      }).catch(err => {
+        console.log('errL: ', err);
+      });
+      // await this.ftp.upload(uri, `${folderName}/${fileName}`).toPromise().then(onUpload =>{
+      //   console.log('resL: ', onUpload)
+      // }).catch(err =>{
+      //   console.log('errL: ', err)
+
+      // })
+      
       // Delete the local file after upload
       await Filesystem.deleteFile({
         path: localFilePath,
@@ -188,7 +208,8 @@ export class StorageService {
     
       // console.log('Data saved to FTP successfully');
       await this.ftp.disconnect();
-      return console.log('Data saved to FTP successfully');
+      console.log('Data saved to FTP successfully');
+      return true;
 
     } catch (error: any) {
       console.error('Error saving to FTP:', error.message, error);
@@ -198,7 +219,7 @@ export class StorageService {
   
   
 
-  private async saveAnswersAsTxt(folderPath: string, answers: any): Promise<void> {
+  async saveAnswersAsTxt(folderPath: string, answers: any): Promise<void> {
     const fileName = 'antworten.txt';
     const textContent = this.formatAnswersAsText(answers);
 
@@ -210,7 +231,7 @@ export class StorageService {
     });
   }
 
-  private async saveImages(folderPath: string): Promise<void> {
+  async saveImages(folderPath: string): Promise<void> {
     const images = await this.photoService.getImages();
 
     for (let i = 0; i < images.length; i++) {

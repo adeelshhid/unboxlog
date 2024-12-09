@@ -4,6 +4,7 @@ import { addIcons } from 'ionicons';
 import { trash, settingsOutline } from 'ionicons/icons';
 import { Observable } from 'rxjs';
 import { PhotoService } from '../services/photo.service';
+import { StorageService } from '../services/storage.service';
 
 @Component({
   selector: 'app-tab3',
@@ -13,7 +14,9 @@ import { PhotoService } from '../services/photo.service';
 export class Tab3Page {
   images$: Observable<string[]>;
 
-  constructor(public photoService: PhotoService, private router: Router) {
+  constructor(public photoService: PhotoService, private router: Router,
+    private storageService:StorageService
+  ) {
     addIcons({ trash,settingsOutline });
     this.images$ = this.photoService.images$;
   }
@@ -31,5 +34,15 @@ export class Tab3Page {
 
   navigateToSettings() {
     this.router.navigate(['/tabs/tab2']);
+  }
+
+  downloadImg(img:string,index:number){
+  //   let url = this.storageService.saveBase64AsImage(img,'img_'+index)
+  //  let imgEl =  document.createElement('img') as HTMLImageElement;
+  //  imgEl.src = url
+  //  imgEl.height = 200;
+  //  imgEl.width = 200;
+  // document.querySelector('ion-content')?.append(imgEl)
+
   }
 }
